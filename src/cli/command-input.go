@@ -57,7 +57,7 @@ func (m *Model) HandleCommandInput(commandInput string, activeCommand string, vi
 			AppState.Filter.Tag = strings.ToUpper(commandValue[:1]) + commandValue[1:]
 			WriteAppState()
 			return queryTaskList()
-		case "fproject":
+		case "fproj":
 			AppState.Filter.ProjectId = commandValue
 			WriteAppState()
 			return queryTaskList()
