@@ -135,6 +135,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msgString == "ctrl+c" || msgString == "esc" {
 			if m.editFormState.isFormVisible {
 				m.editFormState.isFormVisible = false
+				return m, tea.Batch(cmds...)
 			}
 			cmds = append(cmds, tea.Quit)
 			return m, tea.Batch(cmds...)

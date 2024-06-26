@@ -24,6 +24,14 @@ func (m *Model) ExitTextInput() {
 	m.tableModel.WithKeyMap(table.DefaultKeyMap())
 }
 
+func doIfContextExists(context string, f func() tea.Msg) tea.Msg {
+	if Contains(AppState.Contexts, context) {
+		return f()
+	}
+
+	return tea.Msg(nil)
+}
+
 func (m *Model) HandleCommandInput(commandInput string, activeCommand string, viewMode string) tea.Cmd {
 	return func() tea.Msg {
 		type emptyMsg struct{}
@@ -69,17 +77,21 @@ func (m *Model) HandleCommandInput(commandInput string, activeCommand string, vi
 			WriteAppState()
 			return queryTaskList()
 		case "cc":
-			rowId := GetRowId(m.tableModel.HighlightedRow())
-			return changeTaskContext(rowId, commandValue)
+			return doIfContextExists(commandValue, func() tea.Msg {
+				rowId := GetRowId(m.tableModel.HighlightedRow())
+				return changeTaskContext(rowId, commandValue)
+			})
 		case "ac":
 			AddContext(commandValue)
 		case "c":
-			SwitchToContext(commandValue)
-			if viewMode == "projects" {
-				return queryProjectList()
-			} else {
-				return queryTaskList()
-			}
+			return doIfContextExists(commandValue, func() tea.Msg {
+				SwitchToContext(commandValue)
+				if viewMode == "projects" {
+					return queryProjectList()
+				} else {
+					return queryTaskList()
+				}
+			})
 		}
 		return emptyMsg{}
 	}
